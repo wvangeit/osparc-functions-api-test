@@ -13,6 +13,7 @@ configuration = osparc_client.Configuration(
 
 with osparc_client.ApiClient(configuration) as api_client:
     api_instance = osparc_client.FunctionsApi(api_client)
+    # print(osparc_client.UsersApi(api_client).get_my_profile())
 
     input_schema = osparc_client.FunctionInputSchema(
         schema_dict={
