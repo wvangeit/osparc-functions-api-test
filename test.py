@@ -13,7 +13,9 @@ configuration = osparc_client.Configuration(
 
 with osparc_client.ApiClient(configuration) as api_client:
     api_instance = osparc_client.FunctionsApi(api_client)
+    job_api_instance = osparc_client.FunctionJobsApi(api_client)
     # print(osparc_client.UsersApi(api_client).get_my_profile())
+    # b_zz
 
     input_schema = osparc_client.FunctionInputSchema(
         schema_dict={
@@ -67,15 +69,17 @@ with osparc_client.ApiClient(configuration) as api_client:
     )
 
     print(f"Running function, created function job: {function_job}\n")
+    function_job_uid = function_job.uid
 
-    # print(f"Function job status: {function_job.to_dict()["status"]}")
-    # job_status = api_instance.function_job_status(function_job.id)
-    #
-    # print(f"Job status: {job_status}")
-    #
-    # job_output = api_instance.function_job_output(function_job.id)
-    #
-    # print(f"Job output: {job_output}")
+    job_status = ''
+    while 'SUCCESS' not in str(job_status):
+        job_status = job_api_instance.function_job_status(function_job.uid)
+        print(f"Job status: {job_status}")
+        time.sleep(1)
+
+    # function_job_uid = '30523096-1555-11f0-a8c6-0242ac14050e'
+    job_output = job_api_instance.function_job_outputs(function_job_uid)
+    print(f"\nJob output: {job_output}")
     #
     # params_list = [None]
     #
