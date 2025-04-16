@@ -9,7 +9,7 @@ def main():
     print("\n".join(os.listdir()))
     print(os.environ)
     input_json = pl.Path(os.environ["INPUT_FOLDER"]) / "function_inputs.json"
-    output_json = pl.Path("function_outputs.json")
+    output_json = pl.Path(os.environ["OUTPUT_FOLDER"]) / "function_outputs.json"
     inputs = json.loads(input_json.read_text())
     print(f"Received inputs: {inputs}")
 
