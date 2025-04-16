@@ -1,14 +1,16 @@
+import json
+import pathlib as pl
+import random
 import time
 
 import osparc_client
 import urllib3
 
-configuration = osparc_client.Configuration(
-    username="test_172e6803b18ece31db58",
-    password="72c0a88656e93672d0ad62f1d20d40722fa07de5",
-    host="http://localhost:8006",
-)
+conf_path = pl.Path("./conf.json")
+conf_dict = json.loads(conf_path.read_text())
+configuration = osparc_client.Configuration(**conf_dict)
 
+PROJECT_ID = 'd4509422-1aa9-11f0-ba78-0242ac140435'
 
 with osparc_client.ApiClient(configuration) as api_client:
     api_instance = osparc_client.FunctionsApi(api_client)
@@ -40,7 +42,7 @@ with osparc_client.ApiClient(configuration) as api_client:
             description="2D Sinc",
             input_schema=input_schema.dict(),
             output_schema=output_schema.dict(),
-            project_id="2988be64-1916-11f0-ba30-0242ac14020e",
+            project_id=PROJECT_ID,
         )
     )
     print(f"Built function: {study_function.to_dict()}\n")
@@ -63,32 +65,53 @@ with osparc_client.ApiClient(configuration) as api_client:
     print(f"Received function: {received_function.to_dict()}\n")
 
     functions_list = api_instance.list_functions()
-    print(f"{len(functions_list)} functions in the database: {[(function.to_dict()['uid'], function.to_dict()['title']) for function in functions_list]}")
-
-    function_job = job_api_instance.create_function_job(
-        function_id=function_id,
-        function_inputs={"inputs_dict": {"x": 1.0, "y": 10.0}},
-    )
-    print(f"Created function job: {function_job.to_dict()}\n")
-
-    function_job = api_instance.run_function(
-          function_id, function_inputs={"inputs_dict": {"x": 1.0, "y": 10.0}}
+    print(
+        f"{len(functions_list)} functions in the database: {[(function.to_dict()['uid'], function.to_dict()['title']) for function in functions_list]}\n"
     )
 
-    print(f"Running function, created function job: {function_job}\n")
-    function_job_uid = function_job.uid
-    
-    print(f"Received function job: {job_api_instance.get_function_job(function_job.uid)}\n")
+    function_jobs_list = job_api_instance.list_function_jobs()
+    print(
+        f"{len(function_jobs_list)} function_jobs in the database: {[(function_job.to_dict()['uid'], function_job.to_dict()['title']) for function_job in function_jobs_list]}\n"
+    )
 
-    job_status = ''
-    while 'SUCCESS' not in str(job_status):
-        job_status = job_api_instance.function_job_status(function_job_uid)
-        print(f"Job status: {job_status}")
-        time.sleep(1)
+    # function_job = job_api_instance.register_function_job(
+    #     job_api_instance.ProjectFunctionJob(
+    #         function_id=function_id,
+    #         inputs={"inputs_dict": {"x": 1.0, "y": 10.0}}
+    #     ),
+    # )
+    # print(f"Created function job: {function_job.to_dict()}\n")
 
-    # # function_job_uid = '30523096-1555-11f0-a8c6-0242ac14050e'
-    job_output = job_api_instance.function_job_outputs(function_job_uid)
-    print(f"\nJob output: {job_output}")
+    function_job = api_instance.run_function(function_id, {"x": 1.0, "y": 10.0})
+
+    for i_run in range(3):
+        if i_run > 0:
+            print("RERUNNING same function")
+        print(f"Running function, created function job: {function_job}\n")
+        function_job_uid = function_job.to_dict()["uid"]
+
+        print(
+            f"Received function job: {job_api_instance.get_function_job(function_job_uid)}\n"
+        )
+
+        job_status = ""
+        while "SUCCESS" not in str(job_status):
+            job_status = job_api_instance.function_job_status(function_job_uid)
+            print(f"Job status: {job_status}")
+            time.sleep(1)
+
+        # # function_job_uid = '30523096-1555-11f0-a8c6-0242ac14050e'
+        job_output = job_api_instance.function_job_outputs(function_job_uid)
+        print(f"\nJob output: {job_output}")
+
+    print("Mapping function:")
+    function_inputs_list = [
+        {"x": random.uniform(1, 10), "y": random.uniform(1, 10)} for _ in range(5)
+    ]
+
+    map_outputs = api_instance.map_function(function_id, function_inputs_list)
+    print(f"Map output: {map_outputs}\n")
+
     #
     # params_list = [None]
     #
