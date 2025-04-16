@@ -39,6 +39,10 @@ with osparc.ApiClient(configuration) as api_client:
             description="2D sinc using solver",
             solver_key=SOLVER_KEY,
             solver_version=SOLVER_VERSION,
+            default_inputs={
+                "input_1": main_file,
+                "input_2": pythoncode_file,
+            },
         )
     )
     print(f"Built function: {solver_function.to_dict()}\n")
@@ -73,19 +77,18 @@ with osparc.ApiClient(configuration) as api_client:
     function_job = api_instance.run_function(
         function_id,
         {
-            "input_1": osparc_client.ValuesValue(main_file),
-            "input_2": osparc_client.ValuesValue(pythoncode_file),
             "input_3": osparc_client.ValuesValue(inputs_file),
         },
     )
 
     function_job_uid = function_job.to_dict()["uid"]
 
-    job_status = ""
-    while "SUCCESS" not in str(job_status):
-        job_status = job_api_instance.function_job_status(function_job_uid)
+    while (
+        job_status := job_api_instance.function_job_status(function_job_uid).status
+    ) not in ("SUCCESS", "FAILED"):
         print(f"Job status: {job_status}")
         time.sleep(1)
+    print(f"Job status: {job_status}")
 
     job_output_dict = job_api_instance.function_job_outputs(function_job_uid)
     print(f"\nJob output: {job_output_dict}")
