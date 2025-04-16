@@ -1,6 +1,7 @@
 import json
 import pathlib as pl
 import time
+import zipfile
 
 import osparc
 import osparc_client
@@ -17,13 +18,17 @@ with osparc.ApiClient(configuration) as api_client:
     file_instance = osparc.FilesApi(api_client)
     file_client_instance = osparc_client.FilesApi(api_client)
 
-    inputs_file = file_instance.upload_file(file="./solver_files/function_inputs.json")
+    inputs_file = file_client_instance.upload_file(
+        file="./solver_files/function_inputs.json"
+    )
     print(f"Uploaded inputs file {inputs_file}\n")
 
-    main_file = file_instance.upload_file(file="./solver_files/mains.py")
+    main_file = file_client_instance.upload_file(file="./solver_files/main.py")
     print(f"Uploaded main file {main_file}\n")
 
-    pythoncode_file = file_instance.upload_file(file="./solver_files/function_code.py")
+    pythoncode_file = file_client_instance.upload_file(
+        file="./solver_files/function_code.py"
+    )
     print(f"Uploaded function code file {pythoncode_file}\n")
 
     print(
@@ -72,12 +77,17 @@ with osparc.ApiClient(configuration) as api_client:
         f"Log: {solver_instance.get_job_output_logfile(solver_key=SOLVER_KEY, version=SOLVER_VERSION, job_id=solver_job.id).decode('utf-8', errors='replace')}\n"
     )
 
-    outputs = solver_instance.get_job_outputs(
+    output_results = solver_instance.get_job_outputs(
         solver_key=SOLVER_KEY, version=SOLVER_VERSION, job_id=job_status.job_id
     )
-    print(f"Job {outputs.job_id} got these results:")
-    for output_name, result in outputs.results.items():
+    for output_name, result in output_results.results.items():
         print(output_name, "=", result)
-        file_instance.download_file(
+        downloaded_file = file_instance.download_file(
             result.actual_instance.id, destination_folder=pl.Path("./solver_files")
         )
+        print(f"Downloaded file: {downloaded_file}")
+        with zipfile.ZipFile(downloaded_file, 'r') as zip_file:
+            job_output = json.loads(zip_file.read('function_outputs.json').decode('utf-8'))
+    
+    print(f"Job output: {job_output}")
+
