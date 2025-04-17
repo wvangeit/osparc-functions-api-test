@@ -20,7 +20,7 @@ DEFAULT_FUNCTION_CODE = \
 import numpy as np
 
 def main(x=None,y=None):
-    return np.sinc(x) * np.sinc(y)
+    return {'2D Sinc': np.sinc(x) * np.sinc(y)}
 """
 DEFAULT_FUNCTION_INPUTS = \
 """
@@ -34,7 +34,7 @@ class SolverGUI:
     def __init__(self, tk_root, client_instance):
         self.root = tk_root
         self.root.title("Solver Function GUI")
-        self.root.geometry("800x600")
+        self.root.geometry("1600x1200")
         self.root.configure(bg="#f5f5f5")
 
         self.api_instance = osparc_client.FunctionsApi(client_instance)
@@ -54,18 +54,37 @@ class SolverGUI:
         self.status_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
 
         # Buttons
-        self.upload_inputs_button = ttk.Button(self.root, text="Upload Code", command=self.upload_inputs)
-        self.upload_inputs_button.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+        self.upload_code_button = ttk.Button(self.root, text="Upload Code", command=self.upload_code)
+        self.upload_code_button.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+
+        self.upload_inputs_button = ttk.Button(self.root, text="Upload Inputs", command=self.upload_inputs)
+        self.upload_inputs_button.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
         self.register_function_button = ttk.Button(self.root, text="Register Function", command=self.register_function)
         self.register_function_button.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
 
         self.run_function_button = ttk.Button(self.root, text="Run Function", command=self.run_function)
-        self.run_function_button.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+        self.run_function_button.grid(row=2, column=1, columnspan=2, padx=10, pady=10, sticky="ew")
+
+        # Multiline text input for function code
+        self.input_label = ttk.Label(self.root, text="Function Code:", background="#f5f5f5", font=("Arial", 12))
+        self.input_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+
+        self.input_code = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 10))
+        self.input_code.insert("1.0", DEFAULT_FUNCTION_CODE)
+        self.input_code.grid(row=4, column=0, columnspan=2, padx=10, pady=5)
+
+        # Multiline text input for function inputs
+        self.inputs_label = ttk.Label(self.root, text="Function Inputs (JSON):", background="#f5f5f5", font=("Arial", 12))
+        self.inputs_label.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+
+        self.inputs_text = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 10))
+        self.inputs_text.insert("1.0", DEFAULT_FUNCTION_INPUTS)
+        self.inputs_text.grid(row=6, column=0, columnspan=2, padx=10, pady=5)
 
         # Add a scrollable frame for the output text
         self.output_frame = ttk.LabelFrame(self.root, text="Output Log", padding=(10, 10))
-        self.output_frame.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.output_frame.grid(row=7, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         self.output_scrollbar = ttk.Scrollbar(self.output_frame, orient="vertical")
         self.output_scrollbar.pack(side="right", fill="y")
@@ -75,24 +94,8 @@ class SolverGUI:
 
         self.output_scrollbar.config(command=self.output_text.yview)
 
-        # Multiline text input for function code
-        self.input_label = ttk.Label(self.root, text="Function Code:", background="#f5f5f5", font=("Arial", 12))
-        self.input_label.grid(row=4, column=0, padx=10, pady=5, sticky="w")
-
-        self.input_code = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 10))
-        self.input_code.insert("1.0", DEFAULT_FUNCTION_CODE)
-        self.input_code.grid(row=5, column=0, columnspan=2, padx=10, pady=5)
-
-        # Multiline text input for function inputs
-        self.inputs_label = ttk.Label(self.root, text="Function Inputs (JSON):", background="#f5f5f5", font=("Arial", 12))
-        self.inputs_label.grid(row=6, column=0, padx=10, pady=5, sticky="w")
-
-        self.inputs_text = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 10))
-        self.inputs_text.insert("1.0", DEFAULT_FUNCTION_INPUTS)
-        self.inputs_text.grid(row=7, column=0, columnspan=2, padx=10, pady=5)
-
         # Configure grid weights for resizing
-        self.root.grid_rowconfigure(3, weight=1)
+        self.root.grid_rowconfigure(7, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
 
@@ -105,17 +108,8 @@ class SolverGUI:
         self.output_text.config(state="disabled")
         self.output_text.see("end")
 
-    def upload_inputs(self):
+    def upload_code(self):
         self.update_status("Uploading code...")
-        function_inputs = self.inputs_text.get("1.0", "end").strip()
-
-        function_inputs_path = pl.Path(FILES_DIR) / "function_inputs.json"
-        function_inputs_path.write_text(function_inputs)
-        self.inputs_file = self.file_client_instance.upload_file(
-            str(function_inputs_path),
-        )
-
-        self.log_output(f"Uploaded inputs file {self.inputs_file}\n")
 
         self.main_file = self.file_client_instance.upload_file(file=str(pl.Path(FILES_DIR) / "main.py"))
         self.log_output(f"Uploaded main file {self.main_file}\n")
@@ -130,6 +124,22 @@ class SolverGUI:
 
         self.log_output(f"Uploaded function code file {self.pythoncode_file}\n")
         self.log_output("Code uploaded successfully.\n")
+        self.update_status("Idle")
+
+    def upload_inputs(self):
+        self.update_status("Uploading inputs...")
+        function_inputs = self.inputs_text.get("1.0", "end").strip()
+
+        function_inputs_path = pl.Path(FILES_DIR) / "function_inputs.json"
+        function_inputs_path.write_text(function_inputs)
+        self.inputs_file = self.file_client_instance.upload_file(
+            str(function_inputs_path),
+        )
+
+        self.log_output(f"Uploaded inputs file {self.inputs_file}\n")
+
+        self.log_output(f"Uploaded function input file {self.pythoncode_file}\n")
+        self.log_output("Inputs uploaded successfully.\n")
         self.update_status("Idle")
 
     def register_function(self):
