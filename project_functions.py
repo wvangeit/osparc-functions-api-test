@@ -66,12 +66,12 @@ with osparc_client.ApiClient(configuration) as api_client:
 
     functions_list = api_instance.list_functions()
     print(
-        f"{len(functions_list)} functions in the database: {[(function.to_dict()['uid'], function.to_dict()['title']) for function in functions_list]}\n"
+        f"{len(functions_list)} functions in the database\n"
     )
 
     function_jobs_list = job_api_instance.list_function_jobs()
     print(
-        f"{len(function_jobs_list)} function_jobs in the database: {[(function_job.to_dict()['uid'], function_job.to_dict()['title']) for function_job in function_jobs_list]}\n"
+        f"{len(function_jobs_list)} function_jobs in the database\n"
     )
 
     # function_job = api_instance.run_function(function_id, {"x": 1.0, "y": 10.0})
@@ -119,4 +119,3 @@ with osparc_client.ApiClient(configuration) as api_client:
 
     for job_id, status in zip(map_job_collection.job_ids, statuses):
         print(f"Job {job_id} output: {job_api_instance.function_job_outputs(job_id)}")
-        
