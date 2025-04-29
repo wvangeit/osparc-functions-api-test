@@ -1,5 +1,9 @@
 mb_test.py
 __pycache__
 conf.json
-solver_files/tmp*
 solver_files/function_outputs.json
+gui_solver_files/function_outputs.json
+solver_files/tmp*
+gui_solver_files/tmp*
+gui_solver_files/function_code.py
+

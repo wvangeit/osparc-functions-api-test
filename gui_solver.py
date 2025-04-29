@@ -34,7 +34,7 @@ class SolverGUI:
     def __init__(self, tk_root, client_instance):
         self.root = tk_root
         self.root.title("Solver Function GUI")
-        self.root.geometry("1600x1200")
+        self.root.geometry("1600x1000")
         self.root.configure(bg="#f5f5f5")
 
         self.api_instance = osparc_client.FunctionsApi(client_instance)
@@ -70,7 +70,7 @@ class SolverGUI:
         self.input_label = ttk.Label(self.root, text="Function Code:", background="#f5f5f5", font=("Arial", 12))
         self.input_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
 
-        self.input_code = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 10))
+        self.input_code = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 14))
         self.input_code.insert("1.0", DEFAULT_FUNCTION_CODE)
         self.input_code.grid(row=4, column=0, columnspan=2, padx=10, pady=5)
 
@@ -78,7 +78,7 @@ class SolverGUI:
         self.inputs_label = ttk.Label(self.root, text="Function Inputs (JSON):", background="#f5f5f5", font=("Arial", 12))
         self.inputs_label.grid(row=5, column=0, padx=10, pady=5, sticky="w")
 
-        self.inputs_text = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 10))
+        self.inputs_text = tk.Text(self.root, height=10, width=80, bg="#eaeaea", font=("Courier", 14))
         self.inputs_text.insert("1.0", DEFAULT_FUNCTION_INPUTS)
         self.inputs_text.grid(row=6, column=0, columnspan=2, padx=10, pady=5)
 
@@ -89,7 +89,7 @@ class SolverGUI:
         self.output_scrollbar = ttk.Scrollbar(self.output_frame, orient="vertical")
         self.output_scrollbar.pack(side="right", fill="y")
 
-        self.output_text = tk.Text(self.output_frame, height=15, width=80, state="disabled", yscrollcommand=self.output_scrollbar.set, bg="#eaeaea", font=("Courier", 10))
+        self.output_text = tk.Text(self.output_frame, height=15, width=80, state="disabled", yscrollcommand=self.output_scrollbar.set, bg="#eaeaea", font=("Courier", 14))
         self.output_text.pack(side="left", fill="both", expand=True)
 
         self.output_scrollbar.config(command=self.output_text.yview)
@@ -138,7 +138,6 @@ class SolverGUI:
 
         self.log_output(f"Uploaded inputs file {self.inputs_file}\n")
 
-        self.log_output(f"Uploaded function input file {self.pythoncode_file}\n")
         self.log_output("Inputs uploaded successfully.\n")
         self.update_status("Idle")
 
