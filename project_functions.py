@@ -40,7 +40,7 @@ with osparc_client.ApiClient(configuration) as api_client:
         osparc_client.ProjectFunction(
             title="Sinc",
             description="2D Sinc",
-            input_schema=input_schema.dict(),
+            # input_schema=input_schema.dict(),
             output_schema=output_schema.dict(),
             project_id=PROJECT_ID,
         )
@@ -102,6 +102,8 @@ with osparc_client.ApiClient(configuration) as api_client:
     function_inputs_list = [
         {"x": int(random.uniform(1,10)), "y": int(random.uniform(1,10))} for _ in range(5)
     ]
+    for inputs in function_inputs_list:
+        print(f"Validation: {api_instance.validate_function_inputs(function_id, inputs)}")
     print(f"Map inputs list: {function_inputs_list}\n")
     map_job_collection = api_instance.map_function(function_id, function_inputs_list)
     print(f"Map job collection: {map_job_collection}\n")
