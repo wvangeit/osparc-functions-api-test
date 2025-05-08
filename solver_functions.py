@@ -49,9 +49,12 @@ def main():
 
         solver_function = osparc_client.Function(
             osparc_client.SolverFunction(
+                uid=None,
                 function_class="solver",
                 title="SincSolver",
                 description="2D sinc using solver",
+                input_schema=None,
+                output_schema=None,
                 solver_key=SOLVER_KEY,
                 solver_version=SOLVER_VERSION,
                 default_inputs={"input_1": main_file, "input_2": pythoncode_file}
@@ -78,14 +81,14 @@ def main():
         received_function = api_instance.get_function(function_id)
         print(f"Received function: {received_function.to_dict()}\n")
 
-        functions_list = api_instance.list_functions()
+        functions_list_len = api_instance.list_functions().total        
         print(
-            f"{len(functions_list)} functions in the database\n"
+            f"{functions_list_len} functions in the database\n"
         )
 
-        function_jobs_list = job_api_instance.list_function_jobs()
+        function_jobs_list_len = job_api_instance.list_function_jobs(limit=50).total
         print(
-            f"{len(function_jobs_list)} function_jobs in the database\n"
+            f"{function_jobs_list_len} function_jobs in the database\n"
         )
 
         # function_job = api_instance.run_function(function_id, {"input_3": inputs_file})

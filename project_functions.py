@@ -38,11 +38,13 @@ with osparc_client.ApiClient(configuration) as api_client:
 
     study_function = osparc_client.Function(
         osparc_client.ProjectFunction(
+            uid=None,
             title="Sinc",
             description="2D Sinc",
-            # input_schema=input_schema.dict(),
+            input_schema=input_schema.dict(),
             output_schema=output_schema.dict(),
             project_id=PROJECT_ID,
+            default_inputs=None
         )
     )
     print(f"Built function: {study_function.to_dict()}\n")
@@ -64,14 +66,14 @@ with osparc_client.ApiClient(configuration) as api_client:
     received_function = api_instance.get_function(function_id)
     print(f"Received function: {received_function.to_dict()}\n")
 
-    functions_list = api_instance.list_functions()
+    functions_list_len = api_instance.list_functions().total
     print(
-        f"{len(functions_list)} functions in the database\n"
+        f"{functions_list_len} functions in the database\n"
     )
 
-    function_jobs_list = job_api_instance.list_function_jobs()
+    function_jobs_list_len = job_api_instance.list_function_jobs().total
     print(
-        f"{len(function_jobs_list)} function_jobs in the database\n"
+        f"{function_jobs_list_len} function_jobs in the database\n"
     )
 
     # function_job = api_instance.run_function(function_id, {"x": 1.0, "y": 10.0})
