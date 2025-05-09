@@ -2,7 +2,7 @@ import json
 import pathlib as pl
 import random
 import time
-
+from collections.abc import Mapping
 import osparc_client
 import urllib3
 
@@ -17,8 +17,8 @@ with osparc_client.ApiClient(configuration) as api_client:
     job_api_instance = osparc_client.FunctionJobsApi(api_client)
     job_collection_api_instance = osparc_client.FunctionJobCollectionsApi(api_client)
 
-    input_schema = osparc_client.FunctionInputSchema(
-        schema_dict={
+    input_schema = osparc_client.JSONFunctionInputSchema(
+        schema_content={
             "type": "object",
             "properties": {
                 "x": {"type": "number"},
@@ -28,8 +28,8 @@ with osparc_client.ApiClient(configuration) as api_client:
         }
     )
 
-    output_schema = osparc_client.FunctionOutputSchema(
-        schema_dict={
+    output_schema = osparc_client.JSONFunctionOutputSchema(
+        schema_content={
             "type": "object",
             "properties": {"result": {"type": "number"}},
             "required": ["result"],
@@ -41,8 +41,8 @@ with osparc_client.ApiClient(configuration) as api_client:
             uid=None,
             title="Sinc",
             description="2D Sinc",
-            input_schema=input_schema.dict(),
-            output_schema=output_schema.dict(),
+            input_schema=osparc_client.InputSchema(input_schema),
+            output_schema=osparc_client.OutputSchema(output_schema),
             project_id=PROJECT_ID,
             default_inputs=None
         )

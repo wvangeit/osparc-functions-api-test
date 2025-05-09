@@ -53,8 +53,8 @@ def main():
                 function_class="solver",
                 title="SincSolver",
                 description="2D sinc using solver",
-                input_schema=None,
-                output_schema=None,
+                input_schema=osparc_client.InputSchema(osparc_client.JSONFunctionInputSchema()),
+                output_schema=osparc_client.OutputSchema(osparc_client.JSONFunctionOutputSchema()),
                 solver_key=SOLVER_KEY,
                 solver_version=SOLVER_VERSION,
                 default_inputs={"input_1": main_file, "input_2": pythoncode_file}
