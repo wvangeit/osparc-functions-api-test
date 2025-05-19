@@ -3,6 +3,7 @@ import pathlib as pl
 import random
 import time
 from collections.abc import Mapping
+
 import osparc_client
 import urllib3
 
@@ -10,7 +11,7 @@ conf_path = pl.Path("./conf.json")
 conf_dict = json.loads(conf_path.read_text('utf-8'))
 configuration = osparc_client.Configuration(**conf_dict)
 
-PROJECT_ID = 'd4509422-1aa9-11f0-ba78-0242ac140435'
+PROJECT_ID = '48eefca0-3491-11f0-818d-02420a025695'
 
 with osparc_client.ApiClient(configuration) as api_client:
     api_instance = osparc_client.FunctionsApi(api_client)
@@ -41,8 +42,8 @@ with osparc_client.ApiClient(configuration) as api_client:
             uid=None,
             title="Sinc",
             description="2D Sinc",
-            input_schema=osparc_client.InputSchema(input_schema),
-            output_schema=osparc_client.OutputSchema(output_schema),
+            input_schema=input_schema,
+            output_schema=output_schema,
             project_id=PROJECT_ID,
             default_inputs=None
         )
