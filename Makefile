@@ -14,3 +14,12 @@ project_functions: clean
 gui_solver: clean-gui-solver
 	./gui_solver.sh
 
+.PHONY: python-client
+python-client:
+	curl https://api.osparc-master.speag.com/api/v0/openapi.json -o openapi.json
+	openapi-generator-cli generate \
+        -i openapi.json \
+        -g python \
+        -o ./flaskapi/functions-api-python-client \
+        --package-name osparc_client
+	pip install ./flaskapi/functions-api-python-client

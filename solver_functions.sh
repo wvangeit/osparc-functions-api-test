@@ -5,9 +5,13 @@ set -e
 rm -rf .venv
 uv venv .venv
 
-source .venv/bin/activate
+curl https://api.osparc-master.speag.com/api/v0/openapi.json -o openapi.json
+uv pip install openapi-generator-cli
+uv run openapi-generator-cli generate \
+    -i openapi.json \
+    -g python \
+    -o ./flaskapi/functions-api-python-client \
+    --package-name osparc_client
+uv pip install ./flaskapi/functions-api-python-client
 
-uv pip install ../osparc-simcore-clients/clients/python/artifacts/dist/osparc_client-0.8.3.post0.dev25-py3-none-any.whl
-uv pip install ../osparc-simcore-clients/clients/python/artifacts/dist/osparc-0.8.3.post0.dev25-py3-none-any.whl
-
-python solver_functions.py
+uv run python solver_functions.py
