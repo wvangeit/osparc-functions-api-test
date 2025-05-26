@@ -7,3 +7,4 @@ gui_solver_files/function_outputs.json
 solver_files/tmp*
 gui_solver_files/tmp*
 gui_solver_files/function_code.py
+conf-*

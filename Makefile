@@ -13,4 +13,6 @@ project_functions: clean
 	./project_functions.sh
 gui_solver: clean-gui-solver
 	./gui_solver.sh
+addsubtract_function:
+	./addsubtract_function.sh
 

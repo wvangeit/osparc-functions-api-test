@@ -145,3 +145,26 @@ with osparc_client.ApiClient(configuration) as api_client:
     #
     # for job_id, status in zip(map_job_collection.job_ids, statuses):
     #     print(f"Job {job_id} output: {job_api_instance.function_job_outputs(job_id)}")
+    function_inputs_list = [
+        {"x": int(random.uniform(1,10)), "y": int(random.uniform(1,10))} for _ in range(5)
+    ]
+    for inputs in function_inputs_list:
+        print(f"Validation: {api_instance.validate_function_inputs(function_id, inputs)}")
+    print(f"Map inputs list: {function_inputs_list}\n")
+    map_job_collection = api_instance.map_function(function_id, function_inputs_list)
+    print(f"Map job collection: {map_job_collection}\n")
+
+    job_collection_status = ""
+
+    while True:
+        job_collection_status = job_collection_api_instance.function_job_collection_status(map_job_collection.uid)
+        statuses = job_collection_status.status
+        print(f"Job collection statuses: {statuses}")
+        # Loop until all statuses are either "SUCCESS" or "FAILED"
+        if statuses and all(s in {"SUCCESS", "FAILED"} for s in statuses):
+            break
+        time.sleep(5)
+
+    for job_id, status in zip(map_job_collection.job_ids, statuses):
+        print(job_id)
+        print(f"Job {job_id} output: {job_api_instance.function_job_outputs(job_id)}")
