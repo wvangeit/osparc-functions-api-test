@@ -14,6 +14,9 @@ configuration = osparc.Configuration(**conf_dict)
 SOLVER_KEY = "simcore/services/comp/osparc-python-runner"
 SOLVER_VERSION = "1.2.0"
 
+# SOLVER_KEY = "simcore/services/comp/s4l-python-runner"
+# SOLVER_VERSION = "1.2.200" 
+
 function_code = """
 import numpy as np
 

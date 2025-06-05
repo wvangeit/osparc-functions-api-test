@@ -15,11 +15,22 @@ configuration = osparc_client.Configuration(**conf_dict)
 # PROJECT_ID = "48eefca0-3491-11f0-818d-02420a025695" #osparc master ints
 PROJECT_ID = "8a55cc42-355d-11f0-ae2d-02420a025669"  # osparc master files
 
+
+FUNCTION_ID = "4f421411-59e9-46d4-b809-9993db62a192"
+
 with osparc_client.ApiClient(configuration) as api_client:
     api_instance = osparc_client.FunctionsApi(api_client)
     studies_instance = osparc_client.StudiesApi(api_client)
     job_api_instance = osparc_client.FunctionJobsApi(api_client)
     job_collection_api_instance = osparc_client.FunctionJobCollectionsApi(api_client)
+
+    found_job_collections = job_collection_api_instance.list_function_job_collections(has_function_id=FUNCTION_ID)
+    print(found_job_collections)
+
+    for job_id in found_job_collections.items[0].job_ids:
+        print(job_id)
+        job = job_api_instance.get_function_job(function_job_id=job_id)
+        assert job.to_dict()['function_uid'] == FUNCTION_ID
 
     ports = studies_instance.list_study_ports(study_id=PROJECT_ID)
     print(f"Ports: {ports}")
