@@ -14,7 +14,7 @@ configuration = osparc_client.Configuration(**conf_dict)
 
 # function_id = "d7a2be5c-2fbf-4194-a435-6c1eeef9de21" # master speag
 # function_id = "73e4cce9-856a-425c-a3f4-6cdfd6293702" # local
-function_id = "a1b64d4f-12e0-4aa8-a1e2-9e3df98cc07b" # aws staging
+function_id = "a1b64d4f-12e0-4aa8-a1e2-9e3df98cc07b"  # aws staging
 
 with osparc_client.ApiClient(configuration) as api_client:
     api_instance = osparc_client.FunctionsApi(api_client)
@@ -41,9 +41,9 @@ with osparc_client.ApiClient(configuration) as api_client:
         # print(f"Running function, created function job: {function_job}\n")
         function_job_uid = function_job.to_dict()["uid"]
 
-        # print(
-        #     f"Received function job: {job_api_instance.get_function_job(function_job_uid)}\n"
-        # )
+        print(
+             f"Received function job: {job_api_instance.get_function_job(function_job_uid)}\n"
+        )
 
         job_status = ""
         while "SUCCESS" not in str(job_status):
@@ -56,7 +56,8 @@ with osparc_client.ApiClient(configuration) as api_client:
 
     print("\nMapping function:")
     function_inputs_list = [
-        {"X": int(random.uniform(1,10)), "Y": int(random.uniform(1,10))} for _ in range(5)
+        {"X": int(random.uniform(1, 10)), "Y": int(random.uniform(1, 10))}
+        for _ in range(5)
     ]
     # for inputs in function_inputs_list:
     #     print(f"Validation: {api_instance.validate_function_inputs(function_id, inputs)}")
@@ -67,7 +68,11 @@ with osparc_client.ApiClient(configuration) as api_client:
     job_collection_status = ""
 
     while True:
-        job_collection_status = job_collection_api_instance.function_job_collection_status(map_job_collection.uid)
+        job_collection_status = (
+            job_collection_api_instance.function_job_collection_status(
+                map_job_collection.uid
+            )
+        )
         statuses = job_collection_status.status
         print(f"Job collection statuses: {statuses}")
         # Loop until all statuses are either "SUCCESS" or "FAILED"
@@ -76,4 +81,12 @@ with osparc_client.ApiClient(configuration) as api_client:
         time.sleep(5)
 
     for job_id, status in zip(map_job_collection.job_ids, statuses):
-        print(f"Job {job_id} output: {job_api_instance.function_job_outputs(job_id)}")
+        job_outputs = job_api_instance.function_job_outputs(job_id)
+        job = job_api_instance.get_function_job(job_id)
+        print(f"Job {job_id} output: {job_outputs}")
+
+        X = job.to_dict()["inputs"]["X"]
+        Y = job.to_dict()["inputs"]["Y"]
+
+        assert job_outputs["X+Y"] == X + Y
+        assert job_outputs["X-Y"] == X - Y
