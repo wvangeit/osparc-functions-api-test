@@ -30,63 +30,88 @@ with osparc_client.ApiClient(configuration) as api_client:
     functions_list_len = api_instance.list_functions().total
     print(f"{functions_list_len} functions in the database\n")
 
-    inputs = {"X": 2.5, "Y": 10}
+    # inputs = {"X": 2.5, "Y": 10}
+    #
+    # print(f"Running function with inputs: {inputs}")
+    # function_job = api_instance.run_function(function_id, inputs)
 
-    print(f"Running function with inputs: {inputs}")
-    function_job = api_instance.run_function(function_id, inputs)
-
-    for i_run in range(3):
-        if i_run > 0:
-            print("RERUNNING same function")
-        # print(f"Running function, created function job: {function_job}\n")
-        function_job_uid = function_job.to_dict()["uid"]
-
-        print(
-             f"Received function job: {job_api_instance.get_function_job(function_job_uid)}\n"
-        )
-
-        job_status = ""
-        while "SUCCESS" not in str(job_status):
-            job_status = job_api_instance.function_job_status(function_job_uid)
-            print(f"Job status: {job_status}")
-            time.sleep(5)
-
-        job_output = job_api_instance.function_job_outputs(function_job_uid)
-        print(f"Job output: {job_output}")
-
-    print("\nMapping function:")
     function_inputs_list = [
         {"X": int(random.uniform(1, 10)), "Y": int(random.uniform(1, 10))}
         for _ in range(5)
     ]
     # for inputs in function_inputs_list:
     #     print(f"Validation: {api_instance.validate_function_inputs(function_id, inputs)}")
-    print(f"Map inputs list: {function_inputs_list}\n")
-    map_job_collection = api_instance.map_function(function_id, function_inputs_list)
-    # print(f"Map job collection: {map_job_collection}\n")
+    print(f"Will run function with list: {function_inputs_list}\n")
+    for function_inputs in function_inputs_list:
+        print(f"Running function with single input: {function_inputs}\n")
+        function_job = api_instance.run_function(function_id, function_inputs)
+        while True:
+            job_status = job_api_instance.function_job_status(function_job.to_dict()['uid'])
+            print(f"Job status: {job_status.status}")
+            if job_status.status in {"SUCCESS", "FAILED"}:
+                break
+            time.sleep(5)
 
-    job_collection_status = ""
+    # job_collection_status = ""
+    #
+    # while True:
+    #     job_collection_status = (
+    #         job_collection_api_instance.function_job_collection_status(
+    #             map_job_collection.uid
+    #         )
+    #     )
+    #     statuses = job_collection_status.status
+    #     print(f"Job collection statuses: {statuses}")
+    #     # Loop until all statuses are either "SUCCESS" or "FAILED"
+    #     if statuses and all(s in {"SUCCESS", "FAILED"} for s in statuses):
+    #         break
+    #     time.sleep(5)
+    #
+    # for job_id, status in zip(map_job_collection.job_ids, statuses):
+    #     job_outputs = job_api_instance.function_job_outputs(job_id)
+    #     job = job_api_instance.get_function_job(job_id)
+    #     print(f"Job {job_id} output: {job_outputs}")
+    #
+    #     X = job.to_dict()["inputs"]["X"]
+    #     Y = job.to_dict()["inputs"]["Y"]
+    #
+    #     assert job_outputs["X+Y"] == X + Y
+    #     assert job_outputs["X-Y"] == X - Y
 
-    while True:
-        job_collection_status = (
-            job_collection_api_instance.function_job_collection_status(
-                map_job_collection.uid
-            )
-        )
-        statuses = job_collection_status.status
-        print(f"Job collection statuses: {statuses}")
-        # Loop until all statuses are either "SUCCESS" or "FAILED"
-        if statuses and all(s in {"SUCCESS", "FAILED"} for s in statuses):
-            break
-        time.sleep(5)
-
-    for job_id, status in zip(map_job_collection.job_ids, statuses):
-        job_outputs = job_api_instance.function_job_outputs(job_id)
-        job = job_api_instance.get_function_job(job_id)
-        print(f"Job {job_id} output: {job_outputs}")
-
-        X = job.to_dict()["inputs"]["X"]
-        Y = job.to_dict()["inputs"]["Y"]
-
-        assert job_outputs["X+Y"] == X + Y
-        assert job_outputs["X-Y"] == X - Y
+    # print("\nMapping function:")
+    # function_inputs_list = [
+    #     {"X": int(random.uniform(1, 10)), "Y": int(random.uniform(1, 10))}
+    #     for _ in range(5)
+    # ]
+    # # for inputs in function_inputs_list:
+    # #     print(f"Validation: {api_instance.validate_function_inputs(function_id, inputs)}")
+    # print(f"Map inputs list: {function_inputs_list}\n")
+    # map_job_collection = api_instance.map_function(function_id, function_inputs_list)
+    # # print(f"Map job collection: {map_job_collection}\n")
+    #
+    # job_collection_status = ""
+    #
+    # while True:
+    #     job_collection_status = (
+    #         job_collection_api_instance.function_job_collection_status(
+    #             map_job_collection.uid
+    #         )
+    #     )
+    #     statuses = job_collection_status.status
+    #     print(f"Job collection statuses: {statuses}")
+    #     # Loop until all statuses are either "SUCCESS" or "FAILED"
+    #     if statuses and all(s in {"SUCCESS", "FAILED"} for s in statuses):
+    #         break
+    #     time.sleep(5)
+    #
+    # for job_id, status in zip(map_job_collection.job_ids, statuses):
+    #     job_outputs = job_api_instance.function_job_outputs(job_id)
+    #     job = job_api_instance.get_function_job(job_id)
+    #     print(f"Job {job_id} output: {job_outputs}")
+    #
+    #     X = job.to_dict()["inputs"]["X"]
+    #     Y = job.to_dict()["inputs"]["Y"]
+    #
+    #     assert job_outputs["X+Y"] == X + Y
+    #     assert job_outputs["X-Y"] == X - Y
+    #
